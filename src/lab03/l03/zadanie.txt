@@ -1,0 +1,6 @@
+A. Wykonać wybrane zadania z załączonego pliku heat.py. 
+Poszczególne zadania mają różną punktację (od 0.5 do 1.5p). 
+Do zdobycia są maksymalnie 4 punkty.
+
+B. Zadanie dodatkowe (2p.)
+Przepisać całość pliku z wykorzystaniem pakietu Pandas.

@@ -87,13 +87,31 @@ b) Utworzyć nowy plik z definicjami faktów, który mógłby posłużyć do wni
    na temat dowolnie wybranego zestawu co najmniej 3 hipotez i co najmniej 3 faktów
    (np. COVID 19 / grypa / przeziębienie / inna choroba; gorączka / kaszel / utrata węchu i smaku / katar).
 '''
+
+x = 0.1 * (0.5 + 0.3 + 0.8)
+y = (0.9 * (0.3 + 0.3 + 0.4)) * (0.1 * (0.5 + 0.3 + 0.8))
+print(x)
+print(y)
+print(x / y)
 for ih, h in enumerate(data["Hypotheses"]):
 
     # Calculate the numerator of the formula    
-    numerator = 1 # Should be replaced by the actual calculations
+    numerator = 0
+    for f_i, fact in enumerate(data["Facts"]):
+        numerator += fact["prob"][ih]
+    numerator *= h['prob']
 
     # Calculate the denominator of the formula
-    denumerator = 1 # Should be replaced by the actual calculations
+    denumerator = 1
+    for h_i, h_v in enumerate(data["Hypotheses"]):
+        prob = 0
+        for f_i, fact in enumerate(data["Facts"]):
+            # print(f'Pr(fk|hi) = {fact["prob"][h_i]}')
+            prob += fact["prob"][h_i]
+        # print(f"SUM(Pr(fk|hi)) = {prob * h['prob']}")
+        denumerator *= prob * h_v['prob']
+    # print(f"denumerator = {denumerator}")
+
 
     # Calculate and print the final result
     pr = numerator / denumerator

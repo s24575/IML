@@ -88,30 +88,22 @@ b) Utworzyć nowy plik z definicjami faktów, który mógłby posłużyć do wni
    (np. COVID 19 / grypa / przeziębienie / inna choroba; gorączka / kaszel / utrata węchu i smaku / katar).
 '''
 
-x = 0.1 * (0.5 + 0.3 + 0.8)
-y = (0.9 * (0.3 + 0.3 + 0.4)) * (0.1 * (0.5 + 0.3 + 0.8))
-print(x)
-print(y)
-print(x / y)
 for ih, h in enumerate(data["Hypotheses"]):
 
     # Calculate the numerator of the formula    
-    numerator = 0
+    numerator = h['prob']
     for f_i, fact in enumerate(data["Facts"]):
-        numerator += fact["prob"][ih]
-    numerator *= h['prob']
-
+        if fact['name'] in selected_facts:
+            numerator *= fact["prob"][ih]
+    
     # Calculate the denominator of the formula
-    denumerator = 1
-    for h_i, h_v in enumerate(data["Hypotheses"]):
-        prob = 0
+    denumerator = 0
+    for ih1, h1 in enumerate(data["Hypotheses"]):
+        f_prob = h1['prob']
         for f_i, fact in enumerate(data["Facts"]):
-            # print(f'Pr(fk|hi) = {fact["prob"][h_i]}')
-            prob += fact["prob"][h_i]
-        # print(f"SUM(Pr(fk|hi)) = {prob * h['prob']}")
-        denumerator *= prob * h_v['prob']
-    # print(f"denumerator = {denumerator}")
-
+            if fact['name'] in selected_facts:
+                f_prob *= fact['prob'][ih1]
+        denumerator += f_prob
 
     # Calculate and print the final result
     pr = numerator / denumerator

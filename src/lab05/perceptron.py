@@ -311,8 +311,9 @@ class simple_perceptron:
 
                 # Calculate weights change
                 for j in range(self.Nin):
-                    # self.weights[j] += 0 # ZADANIE - uzupełnić prawą stronę wzoru na zmianę wagi (2p)
-                    self.weights[j] += -self.learning_rate * ((2 * (Yout - Ytrain[i])) / self.Nin)
+                    # ZADANIE - uzupełnić prawą stronę wzoru na zmianę wagi (2p)
+                    gradient = (Yout - Ytrain[i]) * Xtrain[i][j]
+                    self.weights[j] += -self.learning_rate * gradient
 
                 # Calculate contribution from the current epoch to the RMS on training set
                 sumRMSE_train += (Yout-Ytrain[i])**2

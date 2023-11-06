@@ -125,13 +125,13 @@ zmienne_do_naprawienia = {"Przepływ":przeplyw,
 ### ZADANIE (1p.) ###
 # Zrealizować automatyczne dodawanie "podejrzanych" zmiennych do słownika "zmienne_do_naprawienia",
 # na podstawie analizy statystyk danej zmiennej.
+zmienne_do_naprawienia = {}
 for nazwa, zmienna in zmienne.items():
     if np.max(zmienna) > 10000:
         zmienne_do_naprawienia[nazwa] = zmienna
 ### KONIEC ###
 
 print("\nCZYSZCZENIE DANYCH")
-
 for nazwa,zmienna in zmienne_do_naprawienia.items():
     for index,wartosc in enumerate(zmienna): # Iterujemy po wszystkich obserwacjach
         # Zakładamy (na podstawie analizy danych), że anomalia to wartość powyżej 10000
@@ -148,20 +148,19 @@ for nazwa,zmienna in zmienne_do_naprawienia.items():
 # Jedna z metod - metoda IQR: https://online.stat.psu.edu/stat200/lesson/3/3.2
 # Inna podpowiedź: https://mateuszgrzyb.pl/3-metody-wykrywania-obserwacji-odstajacych-w-python/
 print("\nCZYSZCZENIE DANYCH")
-
 for nazwa,zmienna in zmienne_do_naprawienia.items():
     q1 = np.percentile(zmienna, 25)
     q3 = np.percentile(zmienna, 75)
     IQR = q3 - q1
     IQR_3by2 = 1.5 * IQR
-    mediana = np.median(zmienna)
-    lower_fence = mediana - IQR_3by2
-    upper_fence = mediana + IQR_3by2
+    median = np.median(zmienna)
+    lower_fence = median - IQR_3by2
+    upper_fence = median + IQR_3by2
     for index,wartosc in enumerate(zmienna):
         if wartosc < lower_fence or upper_fence < wartosc:
             print("Dla zmiennej {} pod indeksem {} znaleziono anomalię o wartości {}".format(nazwa, index, wartosc))
-            print("Naprawiam. Stara wartość: {}, nowa wartość: {}".format(zmienna[index], mediana))
-            zmienna[index] = mediana
+            print("Naprawiam. Stara wartość: {}, nowa wartość: {}".format(zmienna[index], median))
+            zmienna[index] = median
 ### KONIEC ###
 
 # Statystyki dla naprawionych zmiennych
@@ -187,23 +186,31 @@ for nazwa,zmienna in zmienne.items():
 # Zapisać powyższe statystyki i wykresy do plików PDF, osobnych dla poszczególnych zmiennych
 # (można wykorzystać dowolną metodę/moduł/bibliotekę/pakiet).
 for nazwa,zmienna in zmienne.items():
-    pdf_pages = PdfPages(f"output_{nazwa}.pdf")
-    pdf_pages.attach_note("\nZmienna (naprawiona): {}\n".format(nazwa))
-    pdf_pages.attach_note("MIN: {}\n".format(min(zmienna)))
-    pdf_pages.attach_note("MAX: {}\n".format(max(zmienna)))
-    pdf_pages.attach_note("ŚREDNIA: {}\n".format(np.mean(zmienna)))
-    pdf_pages.attach_note("MEDIANA: {}\n".format(np.median(zmienna)))
-    pdf_pages.attach_note("ZAKRES: {}\n".format(np.ptp(zmienna)))
-    pdf_pages.attach_note("ODCHYLENIE STANDARDOWE: {}\n".format(np.std(zmienna)))
-    pdf_pages.attach_note("WARIANCJA: {}\n".format(np.var(zmienna)))
-    pdf_pages.attach_note("PERCENTYL 90%: {}\n".format(np.percentile(zmienna, 90)))
+    pdf = PdfPages(f"{nazwa}.pdf")
+
+    txt = []
+    txt.append(f"MIN: {np.min(zmienna)}")
+    txt.append(f"MAX: {np.max(zmienna)}")
+    txt.append(f"ŚREDNIA: {np.mean(zmienna)}")
+    txt.append(f"MEDIANA: {np.median(zmienna)}")
+    txt.append(f"ZAKRES: {np.max(zmienna) - np.min(zmienna)}")
+    txt.append(f"ODCHYLENIE STANDARDOWE: {np.std(zmienna)}")
+    txt.append(f"WARIANCJA: {np.var(zmienna)}")
+    txt.append(f"PERCENTYL 90%: {np.percentile(zmienna, 90)}")
+
+    info = plt.figure()
+    info.clf()
+    info.text(0.1, 0.3, "\n".join(txt), fontsize=12)
+    pdf.savefig()
+    plt.close()
 
     plt.hist(zmienna, 100)
     plt.title('Histogram dla: ' + nazwa)
     plt.xlabel('Przedział')
     plt.ylabel('Liczba obserwacji')
-    pdf_pages.savefig()
-    pdf_pages.close()
+    pdf.savefig()
+    plt.close()
+    pdf.close()
 ### KONIEC ###
 
 
@@ -262,6 +269,7 @@ for nazwa1,zmienna1 in zmienne.items():
     for nazwa2,zmienna2 in zmienne.items():
         if nazwa1 != nazwa2:
             correlation_list.append([nazwa1, nazwa2, ncorrelate(zmienna1, zmienna2)])
+correlation_list = sorted(correlation_list, key=lambda x: x[2], reverse=True)
 print(correlation_list)
 ### KONIEC ###
 
@@ -274,7 +282,7 @@ plt.plot(range(len(moc)), moc, "x", label="Moc")
 plt.plot(range(len(przeplyw)), przeplyw, "+", label="Przepływ")
 plt.title("Duża korelacja dodatnia")
 plt.xlabel('Numer obserwacji')
-plt.legend()
+plt.legend() 
 plt.show()
 
 # Dla lepszej ilustracji: wycinek danych.
@@ -367,6 +375,19 @@ plt.show()
 # Wynika to z tego, że inaczej dane rozkładają się w róznych porach roku.
 # Należy więc podzielić dane na kilka podzakresów i regresję wykonać osobno
 # dla każdego z podzakresu. Narysować odpowiedni wykres.
+temp_zasilania_4_pory_roku = np.array_split(temp_zasilania, 4)
+for temp_zasilania_pora_roku in temp_zasilania_4_pory_roku:
+    x = range(len(temp_zasilania_pora_roku))
+    y = temp_zasilania_pora_roku
+    a,b = np.polyfit(x,y,1)  # Wielomian 1 rzędu - prosta
+    print("Wzór prostej: y(x) =",a,"* x +",b)
+    yreg =  [a*i + b for i in x]
+    plt.plot(x,y, label="Temperatura zasilania")
+    plt.plot(x,yreg, label="Wynik regresji")
+    plt.title("Regresja liniowa dla całosci danych zmiennej temp_zasilania")
+    plt.xlabel('Numer obserwacji')
+    plt.legend()
+    plt.show()
 ### KONIEC ###
 
 # Regresja liniowa dla zmiennych z dużą korelacją dodatnią: moc, przeplyw
@@ -405,4 +426,7 @@ print("Wyniki predykcji temp_powrotu(roznica_temp):",temp_powrotu)
 
 ### ZADANIE (0.5p.) ###
 # Zapisać wyniki powyższej predykcji do pliku JSON o nazwie predykcja.json
+import json
+with open('prediction.json', 'w') as file:
+    json.dump(temp_powrotu, file)
 ### KONIEC ###

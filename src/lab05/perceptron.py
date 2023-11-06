@@ -311,7 +311,8 @@ class simple_perceptron:
 
                 # Calculate weights change
                 for j in range(self.Nin):
-                    self.weights[j] += 0 # ZADANIE - uzupełnić prawą stronę wzoru na zmianę wagi (2p) 
+                    # self.weights[j] += 0 # ZADANIE - uzupełnić prawą stronę wzoru na zmianę wagi (2p)
+                    self.weights[j] += -self.learning_rate * ((2 * (Yout - Ytrain[i])) / self.Nin)
 
                 # Calculate contribution from the current epoch to the RMS on training set
                 sumRMSE_train += (Yout-Ytrain[i])**2
@@ -397,6 +398,17 @@ class simple_perceptron:
         '''
 
         # ZADANIE - opracować i zaimplementować zapis parametrów modelu do pliku YAML (1p)
+        with open(filename, "w") as file:
+            data = {
+                'Nin': self.Nin,
+                'activation': self.activation,
+                'epochs': self.epochs,
+                'learning_rate': self.learning_rate,
+                'max_val': self.max_val,
+                'min_val': self.min_val,
+                'weights': np.ndarray.tolist(self.weights),
+            }
+            yaml.dump(data, file)
 
         print(f'Model has been saved to file {filename}.')
 
@@ -411,5 +423,24 @@ class simple_perceptron:
         '''
 
         # ZADANIE - zaimplementować odczyt parametrów modelu z pliku YAML (1p)
-        
+        data = None
+        with open(filename, "r") as file:
+            try:
+                data = yaml.safe_load(file)
+            except yaml.YAMLError as e:
+                print(e)
+
+        if data is not None:
+            try:
+                self.Nin = data['Nin']
+                self.activation = data['activation']
+                self.epochs = data['epochs']
+                self.learning_rate = data['learning_rate']
+                self.max_val = data['max_val']
+                self.min_val = data['min_val']
+                weights = np.array(data['weights'])
+                self.weights = weights
+            except KeyError as e:
+                print(f"Incorrect key in {filename}: {e}")
+
         print(f'Model has been loaded from file {filename}.')

@@ -1,3 +1,5 @@
+from random import random
+
 import numpy as np
 import csv
 import yaml
@@ -18,7 +20,7 @@ class simple_perceptron:
               Nin inputs
     '''
 
-    def __init__(self, epochs=100, learning_rate=0.1, activation='tanh'):
+    def __init__(self, epochs=100, learning_rate=0.1, activation='tanh', use_momentum=False, use_bias=False):
         '''
         Constructor.
         Parameters:
@@ -31,6 +33,8 @@ class simple_perceptron:
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.activation = activation
+        self.use_momentum = use_momentum
+        self.use_bias = use_bias
         random_seed = 100
         np.random.seed(random_seed)
 
@@ -151,7 +155,12 @@ class simple_perceptron:
         '''
 
         self.weights = np.random.random(self.Nin)
-        
+        if self.use_bias:
+            self.bias = 1
+        else:
+            self.bias = 0
+        print("Bias:", self.bias)
+
         # Alternative way - without using numpy:
         # self.weights = [random.random() for i in range(self.Nin)]
         #
@@ -294,6 +303,7 @@ class simple_perceptron:
         # Lists for storing RMSE for each epoch
         RMSE_train = []
         RMSE_valid = []
+        alpha = 1
 
         # Iterate over epochs
         for epoch in range(self.epochs):
@@ -301,18 +311,34 @@ class simple_perceptron:
 
             # Calculate output from the perceptron
             sumRMSE_train = 0
+            weight_delta_list = [0] * (self.Nin + 1)
             for i in range(len(Xtrain)):
                 # i - index of the input training pattern
                 sumWeighted = 0
                 for j in range(self.Nin):
                     # j - index of the weight, for the given input pattern
                     sumWeighted += self.weights[j]*Xtrain[i][j]
+                    sumWeighted += self.bias
                 Yout = self.f(sumWeighted)
 
                 # Calculate weights change
                 for j in range(self.Nin):
-                    self.weights[j] += \
-                        self.learning_rate * self.fp(sumWeighted) * (Ytrain[i]-Yout)*Xtrain[i][j]
+                    weight_delta = self.learning_rate * self.fp(sumWeighted) * (Ytrain[i]-Yout)*Xtrain[i][j]
+                    if self.use_momentum:
+                        self.weights[j] += weight_delta + alpha * weight_delta_list[j]
+                        weight_delta_list[j] = weight_delta
+                    else:
+                        self.weights[j] += weight_delta
+
+                # Calculate bias change
+                weight_delta = self.learning_rate * self.fp(sumWeighted) * (Ytrain[i] - Yout) * self.bias
+                if self.use_momentum:
+                    self.bias += weight_delta + alpha * weight_delta_list[-1]
+                    weight_delta_list[-1] = weight_delta
+                else:
+                    self.bias += weight_delta
+
+                print("Bias: ", self.bias)
 
                 # Calculate contribution from the current epoch to the RMS on training set
                 sumRMSE_train += (Yout-Ytrain[i])**2
@@ -328,6 +354,7 @@ class simple_perceptron:
                     sumWeighted = 0
                     for j in range(self.Nin):
                         sumWeighted += self.weights[j]*Xvalid[i][j]
+                        sumWeighted += self.bias
                     Yout = self.f(sumWeighted)
                     sumRMSE_valid += (Yout-Yvalid[i])**2
 
@@ -358,6 +385,7 @@ class simple_perceptron:
             for j in range(self.Nin):
                 # j - index of the weight, for the given input pattern
                 sumWeighted += self.weights[j]*Xtest[i][j]
+                sumWeighted += self.bias
             Y.append(self.f(sumWeighted))
 
         return Y
@@ -403,7 +431,8 @@ class simple_perceptron:
                 'activation':self.activation,
                 'min_val':self.min_val,
                 'max_val':self.max_val,
-                'weights':self.weights.tolist()}
+                'weights':self.weights.tolist(),
+                'bias':self.bias}
 
         with open(filename, 'w') as file:
             yaml.dump(data, file, default_flow_style=False)
@@ -434,6 +463,7 @@ class simple_perceptron:
             self.min_val = data['min_val']
             self.max_val = data['max_val']
             self.weights = list(data['weights'])
+            self.bias = data['bias']
         except KeyError:
             sys.exit('Error: Wrong format of the model file.')
         else:

@@ -9,6 +9,8 @@ if __name__ == '__main__':
     ACTIVATION = 'tanh'
     SPLIT = 0.2
     SHUFFLE = False
+    USE_MOMENTUM = False
+    USE_BIAS = False
 
     # Parse the arguments as parameters which can override defaults.
     # They can be also read from a file (@file.par)
@@ -25,6 +27,10 @@ if __name__ == '__main__':
         type=float, default=SPLIT, metavar='float')
     ap.add_argument('-f', '--shuffle', help='Enable data shuffle',
         action='store_true', default=SHUFFLE)
+    ap.add_argument('-v', '--use_momentum', help='Use momentum method',
+        action='store_true', default=USE_MOMENTUM)
+    ap.add_argument('-b', '--use_bias', help='Enable bias node',
+        action='store_true', default=USE_BIAS)
 
     args = vars(ap.parse_args())
 
@@ -34,12 +40,16 @@ if __name__ == '__main__':
     learning_rate = args['learning_rate']
     split = args['split']
     shuffle = args['shuffle']
-
+    use_momentum = args['use_momentum']
+    use_bias = args['use_bias']
 
     # Create instance of the simple_perceptron class
     p = simple_perceptron(epochs=epochs,
                           learning_rate=learning_rate,
-                          activation=activation)
+                          activation=activation,
+                          use_momentum=use_momentum,
+                          use_bias=use_bias
+                          )
 
     # Get the data from a CSV file
     X,Y = p.read_input_data(input_filename)

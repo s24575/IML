@@ -1,9 +1,9 @@
 Nin: 2
-activation: relu
+activation: tanh
 epochs: 100
 learning_rate: 0.1
 max_val: 10.0
 min_val: 0.0
 weights:
-- 0.9999735627374481
-- 1.0000209913060145
+- 1.113552993478331
+- 1.7547559595987783

@@ -153,13 +153,13 @@ class simple_perceptron:
         Returns:
             None
         '''
-
-        self.weights = np.random.random(self.Nin)
         if self.use_bias:
             self.bias = 1
+            self.Nin += 1
         else:
             self.bias = 0
         print("Bias:", self.bias)
+        self.weights = np.random.random(self.Nin)
 
         # Alternative way - without using numpy:
         # self.weights = [random.random() for i in range(self.Nin)]
@@ -303,7 +303,7 @@ class simple_perceptron:
         # Lists for storing RMSE for each epoch
         RMSE_train = []
         RMSE_valid = []
-        alpha = 1
+        alpha = 1.0
 
         # Iterate over epochs
         for epoch in range(self.epochs):
@@ -314,11 +314,13 @@ class simple_perceptron:
             weight_delta_list = [0] * (self.Nin + 1)
             for i in range(len(Xtrain)):
                 # i - index of the input training pattern
+                if self.use_bias:
+                    Xtrain[i] = np.append(Xtrain[i], self.bias)
+
                 sumWeighted = 0
                 for j in range(self.Nin):
                     # j - index of the weight, for the given input pattern
                     sumWeighted += self.weights[j]*Xtrain[i][j]
-                    sumWeighted += self.bias
                 Yout = self.f(sumWeighted)
 
                 # Calculate weights change
@@ -330,15 +332,7 @@ class simple_perceptron:
                     else:
                         self.weights[j] += weight_delta
 
-                # Calculate bias change
-                weight_delta = self.learning_rate * self.fp(sumWeighted) * (Ytrain[i] - Yout) * self.bias
-                if self.use_momentum:
-                    self.bias += weight_delta + alpha * weight_delta_list[-1]
-                    weight_delta_list[-1] = weight_delta
-                else:
-                    self.bias += weight_delta
-
-                print("Bias: ", self.bias)
+                print("Bias weight: ", self.weights[-1])
 
                 # Calculate contribution from the current epoch to the RMS on training set
                 sumRMSE_train += (Yout-Ytrain[i])**2
@@ -351,10 +345,11 @@ class simple_perceptron:
                 # Calculate RMS on validating set
                 sumRMSE_valid = 0
                 for i in range(len(Xvalid)):
+                    if self.use_bias:
+                        Xvalid[i] = np.append(Xvalid[i], self.bias)
                     sumWeighted = 0
                     for j in range(self.Nin):
                         sumWeighted += self.weights[j]*Xvalid[i][j]
-                        sumWeighted += self.bias
                     Yout = self.f(sumWeighted)
                     sumRMSE_valid += (Yout-Yvalid[i])**2
 
@@ -380,12 +375,13 @@ class simple_perceptron:
         Y = []
         # Calculate output from the perceptron
         for i in range(len(Xtest)):
+            if self.use_bias:
+                Xtest[i] = np.append(Xtest[i], self.bias)
             # i - index of the input pattern
             sumWeighted = 0
             for j in range(self.Nin):
                 # j - index of the weight, for the given input pattern
                 sumWeighted += self.weights[j]*Xtest[i][j]
-                sumWeighted += self.bias
             Y.append(self.f(sumWeighted))
 
         return Y
@@ -410,6 +406,8 @@ class simple_perceptron:
         plt.title('Results of training of simple perceptron')
         plt.xlabel('Epoch')
         plt.ylabel('RMSE')
+        ax = plt.gca()
+        ax.set_ylim([0, 0.5])
         plt.savefig(filename)
         if show:
             plt.show()

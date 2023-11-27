@@ -1,8 +1,8 @@
 Uzupełnić jeden z zamieszczonych skryptów train.py (z użyciem Keras lub Keras Core) o:
-normowanie (skalowanie) danych treningowych do przedziału [0,1] lub ich standaryzację
-zapisywanie parametrów normalizacji/standaryzacji do pliku
-automatyczny podział na zbiór treningowy i walidujący podczas treningu
+    normowanie (skalowanie) danych treningowych do przedziału [0,1] lub ich standaryzację
+    zapisywanie parametrów normalizacji/standaryzacji do pliku
+    automatyczny podział na zbiór treningowy i walidujący podczas treningu
 
 Uzupełnić jeden z zamieszczonych skryptów predict.py (z użyciem Keras lub Keras Core) o:
-normowanie (skalowanie) danych testowych do przedziału [0,1] lub ich standaryzację. Wybrana metoda musi być spójna z tą zastosowaną w train.py)
-wczytanie z pliku parametrów normalizacji/standaryzacji i wykorzystanie ich do odwrócenia normalizacji/standaryzacji
+    normowanie (skalowanie) danych testowych do przedziału [0,1] lub ich standaryzację. Wybrana metoda musi być spójna z tą zastosowaną w train.py)
+    wczytanie z pliku parametrów normalizacji/standaryzacji i wykorzystanie ich do odwrócenia normalizacji/standaryzacji

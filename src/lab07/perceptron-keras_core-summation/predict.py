@@ -2,6 +2,8 @@
 
 # Set TensorFlow backend
 import os
+import joblib
+
 os.environ["KERAS_BACKEND"] = "tensorflow"
 
 from keras_core.models import load_model
@@ -17,9 +19,15 @@ NIN = 2
 X = dataset[:, 0:NIN]
 Y = dataset[:, NIN:]
 
+scaler = joblib.load('scaler.save')
+X = scaler.transform(X)
+
 model = load_model("summation.keras")
 
 predictions = model.predict(X)
+print(predictions)
+predictions = scaler.inverse_transform(predictions).reshape(-1, 1)
+print(predictions)
 
 print("\nTest results:")
 # Caution: the following loop makes sense only for summation of 2 numbers

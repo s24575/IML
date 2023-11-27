@@ -2,6 +2,10 @@
 
 # Set TensorFlow backend
 import os
+
+from sklearn.preprocessing import StandardScaler
+import joblib
+
 os.environ["KERAS_BACKEND"] = "tensorflow"
 
 from keras_core.models import Sequential
@@ -31,15 +35,22 @@ dataset = numpy.loadtxt("train_data.csv", delimiter=",")
 X = dataset[:, 0:NIN]
 Y = dataset[:, NIN:]
 
+scaler = StandardScaler()
+scaler.fit(X)
+print(X)
+dataset = scaler.transform(X)
+print(X)
+joblib.dump(scaler, 'scaler.save')
+
 model = Sequential()
 # Input layer (NIN inputs)
 model.add(Input(shape=(NIN,)))
 # Simple perceptron (when NOUT = 1) or single layer (when NOUT > 1)
 model.add(Dense(NOUT, activation="tanh"))
 # Example multi-layer network (NIN - 3 - 12 - NOUT neurons):
-#model.add(Dense(3, input_dim=NIN, activation="tanh"))
-#model.add(Dense(12, input_dim=NIN, activation="tanh"))
-#model.add(Dense(NOUT, activation="tanh"))
+# model.add(Dense(3, input_dim=NIN, activation="tanh"))
+# model.add(Dense(12, input_dim=NIN, activation="tanh"))
+# model.add(Dense(NOUT, activation="tanh"))
 
 # Compile model
 # Loss functions: https://keras.io/losses/
@@ -47,7 +58,7 @@ model.add(Dense(NOUT, activation="tanh"))
 model.compile(loss="mean_squared_error", optimizer="sgd")
 
 # Train the model
-model.fit(X, Y, epochs=EPOCHS, batch_size=1)
+model.fit(X, Y, epochs=EPOCHS, validation_split=0.2, batch_size=1)
 
 # Save model to a file
 model.save("summation.keras")

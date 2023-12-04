@@ -19,14 +19,18 @@ NIN = 2
 X = dataset[:, 0:NIN]
 Y = dataset[:, NIN:]
 
-scaler = joblib.load('scaler.save')
-X = scaler.transform(X)
+scaler_X = joblib.load('scaler_X.save')
+X_sc = scaler_X.transform(X)
+print(X)
+print(X_sc)
+
+scaler_Y = joblib.load('scaler_Y.save')
 
 model = load_model("summation.keras")
 
-predictions = model.predict(X)
-print(predictions)
-predictions = scaler.inverse_transform(predictions).reshape(-1, 1)
+predictions_sc = model.predict(X_sc)
+print(predictions_sc)
+predictions = scaler_Y.inverse_transform(predictions_sc)
 print(predictions)
 
 print("\nTest results:")

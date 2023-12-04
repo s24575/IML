@@ -35,12 +35,20 @@ dataset = numpy.loadtxt("train_data.csv", delimiter=",")
 X = dataset[:, 0:NIN]
 Y = dataset[:, NIN:]
 
-scaler = StandardScaler()
-scaler.fit(X)
+scaler_X = StandardScaler()
+scaler_X.fit(X)
+X_sc = scaler_X.transform(X)
+joblib.dump(scaler_X, 'scaler_X.save')
+
+scaler_Y = StandardScaler()
+scaler_Y.fit(Y)
+Y_sc = scaler_Y.transform(Y)
+joblib.dump(scaler_Y, 'scaler_Y.save')
+
 print(X)
-dataset = scaler.transform(X)
-print(X)
-joblib.dump(scaler, 'scaler.save')
+print(X_sc)
+print(Y)
+print(Y_sc)
 
 model = Sequential()
 # Input layer (NIN inputs)
@@ -58,7 +66,7 @@ model.add(Dense(NOUT, activation="tanh"))
 model.compile(loss="mean_squared_error", optimizer="sgd")
 
 # Train the model
-model.fit(X, Y, epochs=EPOCHS, validation_split=0.2, batch_size=1)
+model.fit(X_sc, Y_sc, epochs=EPOCHS, validation_split=0.2, batch_size=1)
 
 # Save model to a file
 model.save("summation.keras")

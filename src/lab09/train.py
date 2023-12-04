@@ -1,4 +1,7 @@
 ﻿import os
+
+from matplotlib import pyplot as plt
+
 # Disable TF warning messages and set backend
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ["KERAS_BACKEND"] = "tensorflow"
@@ -8,9 +11,9 @@ import keras_core as keras
 MODEL_FILENAME = "model.keras"
 NO_OF_CLASSES = 10
 VAL_SPLIT = 0.2
-EPOCHS = 1
-HIDDEN_UNITS = 1
-BATCH_SIZE = 1
+EPOCHS = 8
+HIDDEN_UNITS = 60
+BATCH_SIZE = 32
 
 class FullyConnectedForMnist:
     '''Simple NN for MNIST database. INPUT => FC/RELU => FC/SOFTMAX'''
@@ -51,8 +54,20 @@ if __name__ == "__main__":
     model.summary()
 
     # Train the model
-    model.fit(x=x_train, y=y_train, epochs=EPOCHS, validation_split=VAL_SPLIT,
-              batch_size=BATCH_SIZE)
+    history = model.fit(x=x_train, y=y_train, epochs=EPOCHS, validation_split=VAL_SPLIT, batch_size=BATCH_SIZE)
+
+    plt.style.use("ggplot")
+    plt.figure()
+    plt.plot(range(EPOCHS), history.history["loss"], label="Train loss")
+    plt.plot(range(EPOCHS), history.history["val_loss"], label="Validation loss")
+    plt.plot(range(EPOCHS), history.history["accuracy"], label="Train accuracy")
+    plt.plot(range(EPOCHS), history.history["val_accuracy"], label="Validation accuracy")
+
+    plt.title("Train / validation loss and accuracy")
+    plt.xlabel("Epoch #")
+    plt.ylabel("Loss")
+    plt.legend(loc="lower left")
+    plt.savefig("model.png")
 
     # Save model to a file
     model.save(MODEL_FILENAME)

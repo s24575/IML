@@ -36,13 +36,19 @@ if __name__ == "__main__":
         # Find the winner class and the probability
         winner_class = np.argmax(prediction)
         winner_probability = np.max(prediction)*100
-        
+
+        max_display_count = 3
+        ind = np.argpartition(prediction, -max_display_count)[-max_display_count:]
+        # reverse and show only top x
+        x = ind[0, np.argsort(prediction[0, ind])]
+        label = str(x)
+
         # Build the text label
-        label = f"prediction = {winner_class} ({winner_probability:.2f}%)"
+        # label = f"prediction = {winner_class} ({winner_probability:.2f}%)"
         
         # Draw the label on the image
         output_image = cv2.resize(image, (500,500))
-        cv2.putText(output_image, label, (10, 25), 
+        cv2.putText(output_image, label, (10, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.75, 255, 2)
 
         # Show the output image        

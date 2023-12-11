@@ -7,6 +7,8 @@ import keras_core as keras
 import numpy as np
 import cv2     # python -m pip install opencv-python
 
+from keras_core.datasets import mnist
+
 # Directory with test set
 TEST_DATASET_DIR = 'mnist-test'
 
@@ -18,12 +20,9 @@ if __name__ == "__main__":
     # Load trained model
     model = keras.models.load_model(MODEL)
 
-    for image_name in os.listdir(TEST_DATASET_DIR):
-        
-        # Load the image
-        image = cv2.imread(TEST_DATASET_DIR + os.path.sep + image_name, 
-                           cv2.IMREAD_GRAYSCALE)
-                
+    (_, _), (x_test, y_test) = mnist.load_data()
+
+    for image, true_label in zip(x_test, y_test):
         # Pre-process the image for classification
         image_data = image.astype('float32') / 255
         image_data = keras.preprocessing.image.img_to_array(image_data)
@@ -32,19 +31,26 @@ if __name__ == "__main__":
         
         # Classify the input image
         prediction = model.predict(image_data, verbose=0)
+        pred_flat = prediction.flatten()
         
         # Find the winner class and the probability
-        winner_class = np.argmax(prediction)
-        winner_probability = np.max(prediction)*100
-
-        max_display_count = 3
-        ind = np.argpartition(prediction, -max_display_count)[-max_display_count:]
-        # reverse and show only top x
-        x = ind[0, np.argsort(prediction[0, ind])]
-        label = str(x)
-
+        # winner_class = np.argmax(prediction)
+        # winner_probability = np.max(prediction)*100
         # Build the text label
         # label = f"prediction = {winner_class} ({winner_probability:.2f}%)"
+
+        n = 3
+        sorted_indices = np.argsort(pred_flat)[::-1]
+        top_n_indices = sorted_indices[:n]
+        top_n_probabilities = pred_flat[top_n_indices]
+
+        label_list = []
+        for index, prob in zip(top_n_indices, top_n_probabilities):
+            prob_pct = prob * 100
+            if prob_pct < 1:
+                break
+            label_list.append("{}: {:0.2f}%".format(index, prob_pct))
+        label = ", ".join(label_list)
         
         # Draw the label on the image
         output_image = cv2.resize(image, (500,500))

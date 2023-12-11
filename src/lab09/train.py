@@ -12,7 +12,7 @@ MODEL_FILENAME = "model.keras"
 NO_OF_CLASSES = 10
 VAL_SPLIT = 0.2
 EPOCHS = 8
-HIDDEN_UNITS = 60
+HIDDEN_UNITS = 100
 BATCH_SIZE = 32
 
 class FullyConnectedForMnist:
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     plt.title("Train / validation loss and accuracy")
     plt.xlabel("Epoch #")
     plt.ylabel("Loss")
-    plt.legend(loc="lower left")
+    plt.legend(loc="right")
     plt.savefig("model.png")
 
     # Save model to a file

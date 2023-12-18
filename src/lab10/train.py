@@ -1,5 +1,6 @@
 ﻿import os
 
+from keras_core.src.metrics import Precision, Recall
 from matplotlib import pyplot as plt
 
 # Disable TF warning messages and set backend
@@ -50,7 +51,7 @@ if __name__ == "__main__":
 
     # Compile the model and print summary
     model.compile(loss='categorical_crossentropy', optimizer='adam', 
-                  metrics=['accuracy'])
+                  metrics=['accuracy', Precision(), Recall()])
     model.summary()
 
     # Train the model
@@ -73,7 +74,8 @@ if __name__ == "__main__":
     model.save(MODEL_FILENAME)
 
     # Evaluate the model on the test data
-    model.evaluate(x_test, y_test)
+    evaluation = model.evaluate(x_test, y_test)
+    a = 1
 
 
 # Zadanie 9.1 (1p)

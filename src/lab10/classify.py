@@ -33,12 +33,6 @@ if __name__ == "__main__":
         prediction = model.predict(image_data, verbose=0)
         pred_flat = prediction.flatten()
         
-        # Find the winner class and the probability
-        # winner_class = np.argmax(prediction)
-        # winner_probability = np.max(prediction)*100
-        # Build the text label
-        # label = f"prediction = {winner_class} ({winner_probability:.2f}%)"
-
         n = 3
         sorted_indices = np.argsort(pred_flat)[::-1]
         top_n_indices = sorted_indices[:n]
@@ -50,12 +44,16 @@ if __name__ == "__main__":
             if prob_pct < 1:
                 break
             label_list.append("{}: {:0.2f}%".format(index, prob_pct))
-        label = ", ".join(label_list)
-        
+        label_pred = ", ".join(label_list)
+
+        label_actual = f"actual: {true_label}"
+
         # Draw the label on the image
-        output_image = cv2.resize(image, (500,500))
-        cv2.putText(output_image, label, (10, 25),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.75, 255, 2)
+        output_image = cv2.resize(image, (500, 500))
+        cv2.putText(output_image, label_pred, (10, 25),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
+        cv2.putText(output_image, label_actual, (10, 55),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
 
         # Show the output image        
         cv2.imshow("Output", output_image)

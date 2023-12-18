@@ -1,4 +1,7 @@
-﻿import os
+﻿import json
+import os
+from collections import Counter
+
 # Disable TF warning messages and set backend
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ["KERAS_BACKEND"] = "tensorflow"
@@ -21,6 +24,16 @@ if __name__ == "__main__":
     model = keras.models.load_model(MODEL)
 
     (_, _), (x_test, y_test) = mnist.load_data()
+
+    NO_OF_CLASSES = 10
+    y_test_categorical = keras.utils.to_categorical(y_test, NO_OF_CLASSES)
+
+    evaluation = model.evaluate(x_test, y_test_categorical)
+
+    print(f'Accuracy: {evaluation[1]}')
+    print(f'Precision: {np.mean(evaluation[2])}')
+    print(f'Recall: {evaluation[3]}')
+    print(f'F1 Score: {evaluation[4]}')
 
     for image, true_label in zip(x_test, y_test):
         # Pre-process the image for classification
@@ -62,14 +75,17 @@ if __name__ == "__main__":
         if cv2.waitKey(0) & 0xFF == ord('q'):
             break
 
+    misclassifications = Counter()
 
-# Zadanie 9.2 (1p)
-# Uzupełnić wyświetlany tekst na obrazie o klasy z miejsca 2 i 3, 
-# o ile ich prawdopodobieństwo jest większe od 1%.
+    predictions = model.predict(x_test)
+    for i in range(len(predictions)):
+        true_label = int(y_test[i])
+        predicted_label = int(predictions[i].argmax())
+        if true_label != predicted_label:
+            misclassification_key = f"{true_label},{predicted_label}"
+            misclassifications[misclassification_key] += 1
 
-# Zadanie 9.3 (1p)
-# Zamiast wczytywać obrazy testowe z plików, ładować je metodą mnist.load_data() 
-# z API KerasCore.
+    misclassifications_sorted = dict(sorted(misclassifications.items(), key=lambda item: item[1], reverse=True))
 
-# Wynik: plik z uzupełnionym kodem oraz plik graficzny 
-# z przykładowym wynikiem predykcji (z co najmniej dwiema klasami).
+    with open("mnist_mislabellings.json", "w") as json_file:
+        json.dump(misclassifications_sorted, json_file, indent=2)

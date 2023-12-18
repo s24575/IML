@@ -1,6 +1,6 @@
 ﻿import os
 
-from keras_core.src.metrics import Precision, Recall
+from keras_core.src.metrics import Precision, Recall, F1Score
 from matplotlib import pyplot as plt
 
 # Disable TF warning messages and set backend
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     # Compile the model and print summary
     model.compile(loss='categorical_crossentropy', optimizer='adam', 
-                  metrics=['accuracy', Precision(), Recall()])
+                  metrics=['accuracy', Precision(), Recall(), F1Score()])
     model.summary()
 
     # Train the model
@@ -75,17 +75,3 @@ if __name__ == "__main__":
 
     # Evaluate the model on the test data
     evaluation = model.evaluate(x_test, y_test)
-    a = 1
-
-
-# Zadanie 9.1 (1p)
-# Uzupełnić plik o rysowanie wykresu funkcji kosztu (loss) oraz dokładności (accuracy) 
-# w funkcji epoki, na zbiorach treningowym i walidującym (na jednym wykresie).
-
-# Zadanie 9.2 (1p)
-# Metodą prób i błędów (maks. kilkanaście prób) dobrać odpowiednie wartości 
-# hiperparametrów: liczbę neuronów w warstwie ukrytej, liczbę epok treningu rozmiar wsadu.
-# Warunek: trening nie powinien trwać dłużej niż kilkanaście sekund.
-# Kluczowe pytanie: co jest wyznacznikiem jakości treningu?
-
-# Wynik: Plik z uzupełnionym kodem oraz plik graficzny z przykładowym wykresem.

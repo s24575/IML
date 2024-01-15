@@ -1,0 +1,11 @@
+Uzupełnić skrypt classify.py z L09 o:
+
+1. Obliczanie i wyświetlanie na ekranie dodatkowych metryk na zbiorze testowym, wczytywanym za pomocą API KerasCore: Accuracy, Precision, Recall oraz F1. Uwaga:  w celu automatyzacji obliczenia metryk konieczna może się okazać drobna modyfikacja skryptu train.py oraz ponowne wytrenowanie modelu. (2p)
+
+2. Wyświetlanie na rysunku z cyfrą napisu (oprócz wyniku/ów predykcji): "actual: X", gdzie X to spodziewany wynik klasyfikacji (rzeczywista wartość). (2p.)
+
+3. Automatyczne zliczanie błędnych klasyfikacji, tzn. zliczanie dla każdej pary cyfr (X,Y) ile razy nastąpiła pomyłka w klasyfikacji X, tzn. spodziewano X, otrzymano Y. (2p)
+
+4. Zapisywanie błędnych par z p.3 do pliku mnist_mislabellings.json, posortowanych od najczęściej występujących, w formacie {{"X1,Y1"}:n1, {"X2,Y2"}:n2, ... }. (2p)
+
+Rozwiązanie zadań - uzupełniony skrypt classify.py oraz plik mnist_mislabellings.json.

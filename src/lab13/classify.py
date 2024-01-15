@@ -6,11 +6,11 @@ from collections import Counter
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ["KERAS_BACKEND"] = "tensorflow"
 
-import keras_core as keras
+import keras
 import numpy as np
 import cv2     # python -m pip install opencv-python
 
-from keras_core.datasets import mnist
+from keras.datasets import mnist
 
 # Directory with test set
 TEST_DATASET_DIR = 'mnist-test'

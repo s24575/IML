@@ -52,11 +52,11 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Train SVM model
-    svm_model = SVC()
-    svm_model.fit(X_train, y_train)
+    model = SVC()
+    model.fit(X_train, y_train)
 
     # Predict on the test set
-    y_pred = svm_model.predict(X_test)
+    y_pred = model.predict(X_test)
 
     # Calculate accuracy
     accuracy = accuracy_score(y_test, y_pred)
@@ -69,7 +69,7 @@ def main():
             image = io.imread(img_path)
             processed_image = process_image(image)
             processed_image = processed_image.reshape(1, -1)
-            pred_label = svm_model.predict(processed_image)
+            pred_label = model.predict(processed_image)
             output_image = cv2.resize(image, (500, 500))
             image_label = f"original: {label}, predicted: {classes[pred_label[0]]}"
             cv2.putText(output_image, image_label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX,

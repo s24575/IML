@@ -27,7 +27,7 @@ def load_images_and_labels(path):
 
 
 def main():
-    classes = ['dog', 'cat']
+    classes = ['cats', 'dogs']
 
     # Path to the training images
     train_path_cats = 'cats_dogs-1000/images/class-0-cats'
@@ -43,7 +43,6 @@ def main():
     labels_cats = [0 for _ in range(len(images_cats))]
     images_dogs = load_images_and_labels(train_path_dogs)
     labels_dogs = [1 for _ in range(len(images_dogs))]
-
 
     # Combine cat and dog images and labels
     X = np.concatenate([images_cats, images_dogs], axis=0)
